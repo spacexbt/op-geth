@@ -52,6 +52,45 @@ commands:
             echo "export GOOGLE_APPLICATION_CREDENTIALS='<< parameters.gcp_cred_config_file_path >>'" | tee -a "$BASH_ENV"
 
 jobs:
+  build-and-deploy:
+    machine:
+      image: ubuntu-2004:current
+    steps:
+      - checkout
+      # Fetch more history for diffing
+      - run:
+          name: Fetch git history
+          command: |
+            git fetch --depth 1000
+
+      # Build forkdiff using Docker
+      - setup_remote_docker
+      - run:
+          name: Build forkdiff
+          command: |
+            docker run --volume $(pwd):/workspace \
+              protolambda/forkdiff:0.1.0 \
+              -repo=/workspace \
+              -fork=/workspace/fork.yaml \
+              -out=/workspace/index.html
+
+      # Prepare pages directory
+      - run:
+          name: Build pages
+          command: |
+            mkdir -p tmp/pages
+            mv index.html tmp/pages/index.html
+            touch tmp/pages/.nojekyll
+            if [ "$CIRCLE_PROJECT_REPONAME" == "op-geth" ] && [ "$CIRCLE_PROJECT_USERNAME" == "ethereum-optimism" ]; then
+              echo "op-geth.optimism.io" > tmp/pages/CNAME
+            fi
+
+      # Deploy to GitHub Pages
+      - run:
+          name: Deploy to GitHub Pages
+          command: |
+            echo "here we would deploy"
+
   docker-release:
     environment:
       DOCKER_BUILDKIT: 1
@@ -107,7 +146,7 @@ jobs:
               -f Dockerfile .
       - when:
           condition:
-            equal: [ true, <<parameters.push_tags>> ]
+            equal: [true, <<parameters.push_tags>>]
           steps:
             - run:
                 name: Tag
@@ -135,7 +174,6 @@ jobs:
                       --image-path="$IMAGE_PATH"\
                       --signer-logging-level="INFO"\
                       --attestor-key-id="//cloudkms.googleapis.com/v1/projects/$ATTESTOR_PROJECT_NAME/locations/global/keyRings/$ATTESTOR_NAME-key-ring/cryptoKeys/$ATTESTOR_NAME-key/cryptoKeyVersions/1"
-
 
   build-geth:
     docker:
@@ -182,7 +220,6 @@ jobs:
           event: fail
           template: basic_fail_1
 
-
 workflows:
   main:
     jobs:
@@ -228,8 +265,20 @@ workflows:
           cron: "0 0 * * *"
           filters:
             branches:
-              only: [ "optimism" ]
+              only: ["optimism"]
     jobs:
       - check-releases:
           name: Check for new upstream releases
           context: slack
+
+  merge:
+    jobs:
+      - build-and-deploy:
+          filters:
+            branches:
+              only: migrate-to-circleci
+
+      # - build-and-deploy:
+      #     filters:
+      #       branches:
+      #         only: optimism
