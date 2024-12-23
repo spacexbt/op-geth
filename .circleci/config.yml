@@ -3,6 +3,7 @@ version: 2.1
 orbs:
   gcp-cli: circleci/gcp-cli@3.0.1
   slack: circleci/slack@4.10.1
+  utils: ethereum-optimism/circleci-utils@0.0.7
 
 parameters:
   go_version:
@@ -88,7 +89,27 @@ jobs:
       - run:
           name: Deploy to GitHub Pages
           command: |
-            echo "here we would deploy"
+            pages_branch="gh-pages-test"
+
+            # Create or switch to gh-pages branch
+            if git ls-remote --heads origin ${pages_branch}; then
+              git fetch origin ${pages_branch}
+              git checkout ${pages_branch}
+            else
+              git checkout --orphan ${pages_branch}
+              git rm -rf .
+            fi
+
+            # Clean existing files (equivalent to clean: true)
+            git rm -rf .
+
+            # Copy new files
+            cp -a tmp/pages/. .
+
+            # Commit and push
+            git add .
+            git commit -m "Deploy to GitHub Pages [skip ci]"
+            # git push origin ${pages_branch} --force
 
   docker-release:
     environment:
