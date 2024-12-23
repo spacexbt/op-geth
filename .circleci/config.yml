@@ -305,10 +305,4 @@ workflows:
           context: circleci-repo-op-geth
           filters:
             branches:
-              only: migrate-to-circleci
-
-      # - build-and-deploy:
-      #   context: circleci-repo-op-geth
-      #     filters:
-      #       branches:
-      #         only: optimism
+              only: optimism
