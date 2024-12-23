@@ -64,7 +64,6 @@ jobs:
             git fetch --depth 1000
 
       # Build forkdiff using Docker
-      - setup_remote_docker
       - run:
           name: Build forkdiff
           command: |
