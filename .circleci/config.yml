@@ -110,8 +110,7 @@ jobs:
             # Commit and push
             git add .
             git commit -m "Deploy to GitHub Pages [skip ci]"
-            echo "${GITHUB_APP_TOKEN}" > gh-token
-            # git -c "http.extraheader=Authorization: Bearer ${GITHUB_APP_TOKEN}"  push origin ${pages_branch} --force
+            git push "https://x-access-token:${GITHUB_APP_TOKEN}@github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git" ${pages_branch} --force
 
   docker-release:
     environment:
