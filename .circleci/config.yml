@@ -109,7 +109,7 @@ jobs:
 
             # Commit and push
             git add .
-            git commit -m "Deploy to GitHub Pages [skip ci]"
+            git commit -m "Deploying to gh-pages from @ ${SOURCE_REPO}@${SOURCE_COMMIT} 🚀"
             git push "https://x-access-token:${GITHUB_APP_TOKEN}@github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git" ${pages_branch} --force
 
   docker-release:
