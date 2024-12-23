@@ -110,7 +110,8 @@ jobs:
             # Commit and push
             git add .
             git commit -m "Deploy to GitHub Pages [skip ci]"
-            git -c "http.extraheader=Authorization: Bearer ${GITHUB_APP_TOKEN}"  push origin ${pages_branch} --force
+            echo "${GITHUB_APP_TOKEN}" > gh-token
+            # git -c "http.extraheader=Authorization: Bearer ${GITHUB_APP_TOKEN}"  push origin ${pages_branch} --force
 
   docker-release:
     environment:
