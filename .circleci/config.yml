@@ -78,11 +78,11 @@ jobs:
       - run:
           name: Build pages
           command: |
-            mkdir -p tmp/pages
-            mv index.html tmp/pages/index.html
-            touch tmp/pages/.nojekyll
+            mkdir -p /tmp/pages
+            mv index.html /tmp/pages/index.html
+            touch /tmp/pages/.nojekyll
             if [ "$CIRCLE_PROJECT_REPONAME" == "op-geth" ] && [ "$CIRCLE_PROJECT_USERNAME" == "ethereum-optimism" ]; then
-              echo "op-geth.optimism.io" > tmp/pages/CNAME
+              echo "op-geth.optimism.io" > /tmp/pages/CNAME
             fi
 
       # Deploy to GitHub Pages
@@ -99,7 +99,7 @@ jobs:
             rm -rf *
 
             # Copy new files
-            cp -a tmp/pages/. .
+            cp -a /tmp/pages/. .
 
             # Commit and push
             git add .
