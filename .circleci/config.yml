@@ -91,17 +91,12 @@ jobs:
           command: |
             pages_branch="gh-pages-test"
 
-            # Create or switch to gh-pages branch
-            if git ls-remote --heads origin ${pages_branch}; then
-              git fetch origin ${pages_branch}
-              git checkout ${pages_branch}
-            else
-              git checkout --orphan ${pages_branch}
-              git rm -rf .
-            fi
+            # Create new orphan branch without parent history
+            git checkout --orphan ${pages_branch}
+            git reset --hard  # Remove all files from staging
 
-            # Clean existing files (equivalent to clean: true)
-            git rm -rf .
+            # Clean working directory
+            rm -rf *
 
             # Copy new files
             cp -a tmp/pages/. .
@@ -109,6 +104,7 @@ jobs:
             # Commit and push
             git add .
             git commit -m "Deploy to GitHub Pages [skip ci]"
+
             # git push origin ${pages_branch} --force
 
   docker-release:
